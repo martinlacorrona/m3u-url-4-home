@@ -1,33 +1,53 @@
 const fs = require('fs')
 const request = require('request')
 const express = require('express')
+const { exit } = require('process')
 const app = express()
 
 require('dotenv').config()
 
-let patternSpain = /#.*ES.*/gm
+// LOAD URL
+let url = process.env.URL
+if(url == undefined) {
+    console.error("[M3U URL 4 HOME] You should define URL value on .env file (if it's not exits, create it)")
+    exit()
+}
+
+// REGEX PATTERN
+let regexPatter = undefined
+if(process.env.REGEX_PATTERN != null) {
+    regexPatter = new RegExp(process.env.REGEX_PATTERN)
+} else {
+    console.log("[M3U URL 4 HOME] You don't have defined an regex pattern on .env file. You can add a new line with REGEX_PATTERN='pattern here'.")
+}
 
 app.get('/', function (req, res) {
-    console.log("[M3U URL 4 HOME] Request recieved")
-    console.time('perfomanceFunctions')
-    request(process.env.URL, function (error, response, body) {
-        var arrayFromServer = body.split("\r\n");
-        var myArray = "#EXTM3U\n"
-        arrayFromServer.forEach((element, index) => {
-            if(patternSpain.test(element)) {
-                myArray += element + "\n"
-                myArray += arrayFromServer[index + 1] + "\n"
-            }
-        });
-        fs.writeFile("./list.m3u", myArray, function(err) {
-            console.log(`[M3U URL 4 HOME] Founded and sending ${myArray.split(/\r\n|\r|\n/).length / 2} channels and movies.`)
-            console.timeEnd('perfomanceFunctions')
+    console.log("[M3U URL 4 HOME] Processing request...")
+    if(regexPatter == undefined) {
+        console.log("[M3U URL 4 HOME] Not regex pattern defined, redirect to URL defined.")
+        res.redirect(url)
+        return
+    }
+
+    console.time('[M3U URL 4 HOME] Time elapsed')
+    request(url, function (error, response, body) {
+        var arrayFromServer = body.split("\r\n")
+        var fileText = "#EXTM3U\n" //Head of file
+            arrayFromServer.forEach((element, index) => {
+                if(regexPatter.test(element)) {
+                    fileText += element + "\n"
+                    fileText += arrayFromServer[index + 1] + "\n"
+                }
+            })
+        fs.writeFile("./list.m3u", fileText, function(err) {
+            console.log(`[M3U URL 4 HOME] Sending ${(fileText.split(/\r\n|\r|\n/).length - 1) / 2} channels and movies.`)
+            console.timeEnd('[M3U URL 4 HOME] Time elapsed')
             res.download("./list.m3u")
         })
-    });
+    })
 })
 
 app.listen(process.env.PORT || 3000, function(err) {
     if(err) console.log(`[M3U URL 4 HOME] Error starting server at ${process.env.PORT || 3000}`)
     else console.log(`[M3U URL 4 HOME] Server start correctly at ${process.env.PORT || 3000}`)
-});
+})

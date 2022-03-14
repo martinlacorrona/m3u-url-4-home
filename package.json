@@ -4,8 +4,7 @@
   "description": "Server that redirects url from server",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npm install && node index.js"
   },
   "author": "",
   "license": "ISC",
