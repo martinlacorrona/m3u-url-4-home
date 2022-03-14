@@ -31,6 +31,13 @@ app.get('/', function (req, res) {
 
     console.time('[M3U URL 4 HOME] Time elapsed')
     request(url, function (error, response, body) {
+        if(error) {
+            console.error(`[M3U URL 4 HOME] Error getting data from URL defined. Error code: ${error.code}`)
+            console.timeEnd('[M3U URL 4 HOME] Time elapsed')
+            res.status(500)
+            res.send("ERROR GETTING LIST FROM URL")
+            return
+        }
         var arrayFromServer = body.split("\r\n")
         var fileText = "#EXTM3U\n" //Head of file
             arrayFromServer.forEach((element, index) => {
