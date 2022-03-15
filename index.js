@@ -1,5 +1,5 @@
 const fs = require('fs')
-const request = require('request')
+const axios = require('axios').default
 const express = require('express')
 const { exit } = require('process')
 const app = express()
@@ -21,7 +21,7 @@ if(process.env.REGEX_PATTERN != null) {
     console.log("[M3U URL 4 HOME] You don't have defined an regex pattern on .env file. You can add a new line with REGEX_PATTERN='pattern here'.")
 }
 
-app.get('/', function (req, res) {
+app.get('/', async function (req, res) {
     console.log("[M3U URL 4 HOME] Processing request...")
     if(regexPatter == undefined) {
         console.log("[M3U URL 4 HOME] Not regex pattern defined, redirect to URL defined.")
@@ -30,15 +30,9 @@ app.get('/', function (req, res) {
     }
 
     console.time('[M3U URL 4 HOME] Time elapsed')
-    request(url, function (error, response, body) {
-        if(error) {
-            console.error(`[M3U URL 4 HOME] Error getting data from URL defined. Error code: ${error.code}`)
-            console.timeEnd('[M3U URL 4 HOME] Time elapsed')
-            res.status(500)
-            res.send("ERROR GETTING LIST FROM URL")
-            return
-        }
-        var arrayFromServer = body.split("\r\n")
+    try {
+        var reponse = await axios.get(url)
+        var arrayFromServer = await reponse.data.split("\r\n")
         var fileText = "#EXTM3U\n" //Head of file
             arrayFromServer.forEach((element, index) => {
                 if(regexPatter.test(element)) {
@@ -51,7 +45,12 @@ app.get('/', function (req, res) {
             console.timeEnd('[M3U URL 4 HOME] Time elapsed')
             res.download("./list.m3u")
         })
-    })
+    } catch(error) {
+        console.error(`[M3U URL 4 HOME] Error getting data from URL defined. Error message: ${error.message}`)
+        console.timeEnd('[M3U URL 4 HOME] Time elapsed')
+        res.status(500)
+        res.send("ERROR GETTING LIST FROM URL")
+    }
 })
 
 app.listen(process.env.PORT || 3000, function(err) {
