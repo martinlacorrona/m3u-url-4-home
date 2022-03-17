@@ -19,6 +19,6 @@ root.rootRoute(app, logger)
 root.updateEnv(logger)
 
 app.listen(process.env.PORT || 3000, function(err) {
-    if(err) logger.error(`[M3U URL 4 HOME] Error starting server at ${process.env.PORT || 3000}\nError: ${err}`)
-    else logger.debug(`[M3U URL 4 HOME] Server start correctly at ${process.env.PORT || 3000}`)
+    if(err) logger.error(`Error starting server at ${process.env.PORT || 3000}\nError: ${err}`)
+    else logger.debug(`Server start correctly at ${process.env.PORT || 3000}`)
 })
