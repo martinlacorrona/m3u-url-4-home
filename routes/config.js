@@ -6,11 +6,13 @@ function configRoute(app, logger) {
         let regexPatternValue = configUtils.getRegex()
         let urlValue = configUtils.getUrl()
         let portValue = configUtils.getPort()
+        let cacheRefresh = configUtils.getCacheRefresh()
     
         res.json({
             regexPattern: regexPatternValue,
             url: urlValue,
-            port: portValue
+            port: portValue,
+            cacheRefresh: cacheRefresh
         })
     })
 
@@ -25,11 +27,12 @@ function configRoute(app, logger) {
             if(req.query.url != configUtils.getUrl()) { //update cache if url changes
                 cacheUtils.updateCache(logger)
             }
-            configUtils.setConfigValues(req.query.url, req.query.regexPattern, req.query.port, logger)
+            configUtils.setConfigValues(req.query.url, req.query.regexPattern, req.query.port, req.query.cacheRefresh, logger)
 
             let regexPatternValue = configUtils.getRegex()
             let urlValue = configUtils.getUrl()
             let portValue = configUtils.getPort()
+            let cacheRefresh = configUtils.getCacheRefresh()
 
             configUtils.updateConfig(logger)
             
@@ -38,7 +41,8 @@ function configRoute(app, logger) {
                 .json({
                     regexPattern: regexPatternValue,
                     url: urlValue,
-                    port: portValue
+                    port: portValue,
+                    cacheRefresh: cacheRefresh
                 })
         }
     })

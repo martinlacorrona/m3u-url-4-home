@@ -34,10 +34,11 @@ function getCacheRefresh() {
     return file.CACHE_REFRESH
 }
 
-function setConfigValues(url, regex, port, logger) {
+function setConfigValues(url, regex, port, cacheRefresh, logger) {
     file.URL = url
     file.REGEX_PATTERN = regex
-    file.PORT = port
+    file.PORT = port || file.PORT
+    file.CACHE_REFRESH = cacheRefresh || file.CACHE_REFRESH
 
     fs.writeFile("config.json", JSON.stringify(file), err => {
         if(err) {
