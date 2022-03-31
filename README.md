@@ -3,13 +3,15 @@ I created this project to run on my raspberry's home to avoid change every time 
 Now, instead of change in all my TVs and smart devices, I need to change URL on my TVs ONETIME to http://pi.hole:3000 and then, I only need to update ".env" file in raspberry every time I change M3U playlist, but not in every device. :)
 
 ## How to use
-Create a ".env" file in root folder and set like this:
+Create a "config.json" file in root folder and set like this:
 ```sh
-URL='http://iptv.getlist.com:8880/get.php?username=user&password=pass&type=m3u_plus&output=mpegts'
-REGEX_PATTERN='#.*group-title="ES.*' #this one is for parse only spain groups
-PORT=3000
+{
+    "URL": "http://iptv.getlist.com:8880/get.php?username=user&password=pass&type=m3u_plus&output=mpegts",
+    "REGEX_PATTERN": "#.*group-title=\"ES.*",
+    "PORT": 3000
+}
 ```
-You can rename ".envEXAMPLE" file to ".env".
+You can rename "configExample.json" file to "config.json".
 
 Then, run:
 ```sh

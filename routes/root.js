@@ -1,13 +1,16 @@
 const fs = require('fs')
 const axios = require('axios').default
-const { exit } = require('process')
 const {performance} = require('perf_hooks');
+const configUtils = require("../utils/configUtils.js")
 
 function rootRoute(app, logger) {
     app.get('/', async function (req, res) {
         logger.debug("Processing request...")
-        updateEnv(logger)
+        configUtils.updateEnv(logger)
     
+        let regexPattern = configUtils.getRegex()
+        let url = configUtils.getUrl()
+
         if(regexPattern == undefined) {
             logger.debug("Not regex pattern defined, redirect to URL defined.")
             res.redirect(url)
@@ -39,24 +42,4 @@ function rootRoute(app, logger) {
     })
 }
 
-function updateEnv(logger) {
-    delete process.env.URL
-    delete process.env.REGEX_PATTERN
-    require('dotenv').config()
-
-    // LOAD URL
-    url = process.env.URL
-    if(url == undefined) {
-        logger.error("You should define URL value on .env file (if it's not exits, create it)")
-        exit()
-    }
-    
-    // REGEX PATTERN
-    if(process.env.REGEX_PATTERN != null) {
-        regexPattern = new RegExp(process.env.REGEX_PATTERN)
-    } else {
-        logger.debug("You don't have defined an regex pattern on .env file. You can add a new line with REGEX_PATTERN='pattern here'.")
-    }
-}
-
-module.exports = {rootRoute, updateEnv}
+module.exports = {rootRoute}
