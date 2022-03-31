@@ -23,25 +23,28 @@ function getUrl() {
 }
 
 function getRegex() {
-    return file.REGEX_PATTERN
+    return new RegExp(file.REGEX_PATTERN)
 }
 
 function getPort() {
     return file.PORT
 }
 
-function setConfigValues(url, regex, port) {
+function getCacheRefresh() {
+    return file.CACHE_REFRESH
+}
+
+function setConfigValues(url, regex, port, logger) {
     file.URL = url
     file.REGEX_PATTERN = regex
     file.PORT = port
-    //TODO: no esta escribiendo el fichero y no se pq :(
+
     fs.writeFile("config.json", JSON.stringify(file), err => {
         if(err) {
             console.error(err)
             return
         }
-        console.log("File updated.")
     })
 }
 
-module.exports = {updateConfig, getUrl, getRegex, getPort, setConfigValues}
+module.exports = {updateConfig, getUrl, getRegex, getPort, getCacheRefresh, setConfigValues}

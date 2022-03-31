@@ -37,3 +37,7 @@ This tool was created with NodeJS v14, but this should works with v10+.
     "port": "3000"
 }
 ```
+
+### How check cache status and update
+- GET ```http://localhost:3000/cache ``` for check
+- POST ```http://localhost:3000/cache ``` for update

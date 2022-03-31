@@ -1,4 +1,5 @@
 const configUtils = require("../utils/configUtils.js")
+const cacheUtils = require("../utils/cacheUtils.js")
 
 function configRoute(app, logger) {
     app.get('/config', async function (req, res) {
@@ -21,7 +22,10 @@ function configRoute(app, logger) {
                     message: "You must to send url param."
                 })
         } else {
-            configUtils.setConfigValues(req.query.url, req.query.regexPattern, req.query.port)
+            if(req.query.url != configUtils.getUrl()) { //update cache if url changes
+                cacheUtils.updateCache(logger)
+            }
+            configUtils.setConfigValues(req.query.url, req.query.regexPattern, req.query.port, logger)
 
             let regexPatternValue = configUtils.getRegex()
             let urlValue = configUtils.getUrl()

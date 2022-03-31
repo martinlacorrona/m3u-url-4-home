@@ -1,7 +1,9 @@
 //IMPORT
-const root = require("./routes/root.js")
-const config = require("./routes/config.js")
-const envUtils = require("./utils/configUtils.js")
+const rootRoute = require("./routes/root.js")
+const configRoute = require("./routes/config.js")
+const cacheRoute = require("./routes/cache.js")
+const configUtils = require("./utils/configUtils.js")
+const cacheUtils = require("./utils/cacheUtils.js")
 
 //Express
 const express = require('express')
@@ -13,14 +15,21 @@ var logger = log4js.getLogger();
 logger.level = "debug"
 
 //Load config
-envUtils.updateConfig(logger)
+configUtils.updateConfig(logger)
+
+//Update cache and timer updater
+cacheUtils.updateCache(logger)
+setInterval(function() {
+    cacheUtils.updateCache(logger)
+}, configUtils.getCacheRefresh() || 1800000) //default 30 minutes
 
 //Rest endpoints
-config.configRoute(app, logger)
-root.rootRoute(app, logger)
+configRoute.configRoute(app, logger)
+rootRoute.rootRoute(app, logger)
+cacheRoute.cacheRoute(app, logger)
 
 //Start server
-app.listen(process.env.PORT || 3000, function(err) {
-    if(err) logger.error(`Error starting server at ${process.env.PORT || 3000}\nError: ${err}`)
-    else logger.debug(`Server start correctly at ${process.env.PORT || 3000}`)
+app.listen(configUtils.getPort() || 3000, function(err) {
+    if(err) logger.error(`Error starting server at ${configUtils.getPort() || 3000}\nError: ${err}`)
+    else logger.debug(`Server start correctly at ${configUtils.getPort() || 3000}`)
 })
