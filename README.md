@@ -19,3 +19,21 @@ npm start
 ```
 This should install all dependencies.
 This tool was created with NodeJS v14, but this should works with v10+.
+
+### How to edit config via REST
+- GET ```http://localhost:3000/config ```
+```sh
+{
+    "regexPattern": "#.*group-title=\"ES.*",
+    "url": "http://iptv.getlist.com:8880/get.php?username=user&password=pass&type=m3u_plus&output=mpegts",
+    "port": "3000"
+}
+```
+- POST ```http://localhost:3000/config?port=3000&regexPattern=%23.*group-title="ES.*&url=http://iptv.getlist.com:8880/get.php?username=user%26password=pass%26type=m3u_plus%26output=mpegts ```
+```sh
+{
+    "regexPattern": "#.*group-title=\"ES.*",
+    "url": "http://iptv.getlist.com:8880/get.php?username=user&password=pass&type=m3u_plus&output=mpegts",
+    "port": "3000"
+}
+```
