@@ -26,6 +26,10 @@ function getRegex() {
     return new RegExp(file.REGEX_PATTERN)
 }
 
+function getRegexString() {
+    return file.REGEX_PATTERN
+}
+
 function getPort() {
     return file.PORT
 }
@@ -48,4 +52,4 @@ function setConfigValues(url, regex, port, cacheRefresh, logger) {
     })
 }
 
-module.exports = {updateConfig, getUrl, getRegex, getPort, getCacheRefresh, setConfigValues}
+module.exports = {updateConfig, getUrl, getRegex, getRegexString, getPort, getCacheRefresh, setConfigValues}

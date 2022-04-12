@@ -3,7 +3,7 @@ const cacheUtils = require("../utils/cacheUtils.js")
 
 function configRoute(app, logger) {
     app.get('/config', async function (req, res) {
-        let regexPatternValue = configUtils.getRegex()
+        let regexPatternValue = configUtils.getRegexString()
         let urlValue = configUtils.getUrl()
         let portValue = configUtils.getPort()
         let cacheRefresh = configUtils.getCacheRefresh()
@@ -29,7 +29,7 @@ function configRoute(app, logger) {
             }
             configUtils.setConfigValues(req.query.url, req.query.regexPattern, req.query.port, req.query.cacheRefresh, logger)
 
-            let regexPatternValue = configUtils.getRegex()
+            let regexPatternValue = configUtils.getRegexString()
             let urlValue = configUtils.getUrl()
             let portValue = configUtils.getPort()
             let cacheRefresh = configUtils.getCacheRefresh()
