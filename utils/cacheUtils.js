@@ -1,15 +1,30 @@
-const fs = require('fs')
+const fs = require('fs').promises
 const fileName = '../lastUpdate.json';
 const file = require(fileName);
 const axios = require('axios').default
 const {performance} = require('perf_hooks');
 const configUtils = require("./configUtils.js")
 
-function sendFile(res) {
-    res.download("./list.m3u")
+var isCacheUpdating = false
+
+async function sendFile(res, logger) {
+    var listPath = "./list.m3u";
+    try {
+        await fs.access(listPath)
+        res.download(listPath)
+    } catch(e) {
+        res
+            .status(400)
+            .send({
+                message: "There's not a m3u download from the url in config, we're trying to download again..."
+            })
+        updateCache(logger)
+    }
 }
 
 async function updateCache(logger) {
+    if(isCacheUpdating) return
+    isCacheUpdating = true
     logger.debug("[CACHE] Updating cache...")
     configUtils.updateConfig(logger)
 
@@ -24,7 +39,6 @@ async function updateCache(logger) {
         if(regexPattern == undefined) { //not regex
             fileText = await reponse.data
         } else { //apply regex
-            fileText = "#EXTM3U\n" //Head of file
             arrayFromServer.forEach((element, index) => {
                 if(regexPattern.test(element)) {
                     fileText += element + "\n"
@@ -32,22 +46,21 @@ async function updateCache(logger) {
                 }
             })
         }
-        fs.writeFile("./list.m3u", fileText, function(err) {
-            finishTime = performance.now()
-            logger.debug(`[CACHE] Cache updated and save on file list.m3u ${(fileText.split(/\r\n|\r|\n/).length - 1) / 2} channels and movies. Time elapsed: ${((finishTime - startTime)/1000.0).toFixed(3)}s`)
-            saveLastUpdate()
-        })
+        await fs.writeFile("./list.m3u", fileText)
+        finishTime = performance.now()
+        logger.debug(`[CACHE] Cache updated and save on file list.m3u ${(fileText.split(/\r\n|\r|\n/).length - 1) / 2} channels and movies. Time elapsed: ${((finishTime - startTime)/1000.0).toFixed(3)}s`)
+        await saveLastUpdate()
     } catch(error) {
         logger.error(`[CACHE] Error updating cache. Error getting data from URL defined. Error message: ${error.message}`)
     }
+    isCacheUpdating = false
 }
 
-function saveLastUpdate() {
+async function saveLastUpdate() {
     file.lastUpdate = Date.now()
-    fs.writeFile("lastUpdate.json", JSON.stringify(file), err => {
+    await fs.writeFile("lastUpdate.json", JSON.stringify(file), err => {
         if(err) {
             console.error(err)
-            return
         }
     })
 }

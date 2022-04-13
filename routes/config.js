@@ -25,7 +25,7 @@ function configRoute(app, logger) {
                 })
         } else {
             if(req.query.url != configUtils.getUrl()) { //update cache if url changes
-                cacheUtils.updateCache(logger)
+                await cacheUtils.updateCache(logger)
             }
             configUtils.setConfigValues(req.query.url, req.query.regexPattern, req.query.port, req.query.cacheRefresh, logger)
 
